@@ -1,0 +1,37 @@
+import pandas as pd
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import r2_score
+from sklearn.linear_model import LinearRegression
+from sklearn.preprocessing import StandardScaler, PolynomialFeatures
+
+print("\n===== Linear Regression ULTRA Optimized (Insurance Cost) =====")
+
+# 1. تحميل البيانات
+df = pd.read_csv("insurance.csv") 
+df = df.dropna()
+
+# 2. تحويل البيانات النصية لأرقام
+X = pd.get_dummies(df.drop("charges", axis=1), drop_first=True)
+y = df["charges"]
+
+# 3. التريكة الكبيرة: Polynomial Features (درجة تانية)
+# دي بتخلي الموديل يدرس تربيع القيم والتفاعل بينها (مثلاً سن^2)
+poly = PolynomialFeatures(degree=2, include_bias=False)
+X_poly = poly.fit_transform(X)
+
+X_train, X_test, y_train, y_test = train_test_split(X_poly, y, test_size=0.2, random_state=42)
+
+# 4. الـ Scaling
+scaler = StandardScaler()
+X_train = scaler.fit_transform(X_train)
+X_test = scaler.transform(X_test)
+
+# 5. تدريب الموديل
+model = LinearRegression()
+model.fit(X_train, y_train)
+
+y_pred = model.predict(X_test)
+
+# 6. النتيجة
+print("Ultra Optimized R2 Score:", r2_score(y_test, y_pred))
